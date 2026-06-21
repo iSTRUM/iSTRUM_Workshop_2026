@@ -3,6 +3,12 @@ addpath(getenv('VBRpath'))
 close all; clear all; clc
 vbr_init
 
+% NOTE TO OCTAVE USERS: adjusting the parameters here cause a crash...
+% to adjust, you'll want to use the latest dev branch of the VBRc.
+% if you cloned the vbrc repo, run
+%   git pull && git checkout main
+% if you forked and cloned
+%   git fetch upstream && git checkout main && git merge upstream/main
 
 %set temperature
 T = 1400+273; %K, temperature
@@ -12,7 +18,7 @@ f =  1e-2; %Hz
 
 %  build 2D grid of grain size and stress
 d   = logspace(1,    5,    40)      ; %um, grain sizes
-sig = logspace(-1,   3,    41)      ; %MPa, differential stress
+sig = logspace(-1,   3,    40)      ; %MPa, differential stress
 
 [SV.dg_um, SV.sig_MPa] = meshgrid(d, sig); %creates an array with dimensions in order of d, and then sig
 
@@ -71,12 +77,6 @@ VBR_disl.in.anelastic.methods_list={'maxwell_analytical'};
 VBR_disl.in.anelastic.maxwell_analytical.viscosity_method_mechanism = 'gbnp';
 [VBR_disl] = VBR_spine(VBR_disl); % run VBR
 
-% save VBR results for later use (optional)
-% save('VBR_linBackstress_pmHTB_pmPeak_61','VBR_HTB',"VBR_peak","VBR_linBackstress","VBR_disl","VBR_in",'-v7.3');
-
-%% or alternatively, load VBR results
-% load VBR_XXX.mat
-
 %% calculate complex viscosity and effective viscosity for each model
 
 VBR.in.SV.f_reshape = reshape(VBR.in.SV.f, [1 1 1 length(f)]); %Hz, reshpae vector for multiplication with 4-D array
@@ -111,11 +111,9 @@ G_tot = 1./(J1_tot+1i.*J2_tot); %calculate combined complex shear modulus
 G_eff_tot = abs(G_tot); %calculate effective shear modulus
 Vs_tot      =  (G_eff_tot./VBR.in.SV.rho).^0.5;%km/s, shear-wave velocity
 Eta_complex_tot     = -1i*G_tot./VBR.in.SV.f_reshape; %complex viscosity
-% Eta_complex_tot(isnan(Eta_complex_tot))=0; %replace NaNs with zeros
 Eta_eff_tot =  abs(Eta_complex_tot);%Pas, magnitude of complex viscosity (i.e., effective viscosity)
+
 %% Map: stress and grain size
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 disp("finding largest mechanism")
@@ -130,6 +128,7 @@ iF = 1;
 % indices (1, 2, or 3 for the HTB, peak, and
 % linearized backstress model, respectively) as a
 % function of grain size and stress.
+mech_order = {"HTB","Pre-melt peak","Backstress","Disl. Creep"};
 for i = 1:length(sig)
     for j = 1:length(d)
         [~,ind] = max([VBR_HTB.out.anelastic.xfit_premelt.J2(i,j,iF) VBR_peak.out.anelastic.xfit_premelt.J2(i,j,iF) VBR_linBackstress.out.anelastic.backstress_linear.J2(i,j,iF) VBR_disl.out.anelastic.maxwell_analytical.J2(i,j,iF)]); %find out premelt (ind=1) or backstress (ind=2) mechanism predicts larger J2 (i.e., is the dominant anelastic mechanism)
@@ -141,7 +140,26 @@ for i = 1:length(sig)
     end
 end
 
+
 figure()
-contourf(log10(sig), log10(d/1e6*1e3), Qmech')
+pcolor(log10(VBR.in.SV.sig_MPa), log10(SV.dg_um/1e6*1e3), Qmech)
 xlabel('log10(stress)')
 ylabel('log10(grain size (mm))')
+title([num2str(f), ' Hz, ', num2str(T - 273), ' ^oC'])
+set(gca, "fontsize", 20)
+
+map = [255 100 100; % color for 1 (red)
+       25 128 25; % color for 2 (dark green)
+       100 100 255; % color for 3 (blue)
+       255 255 25] / 255; % color for 4 (yellow)
+colormap(map);
+caxis([0.5 4.5]);    % align integer centers to colormap rows
+cb = colorbar;
+
+if is_octave
+    set(cb, 'ytick', 1:4, 'yticklabel', mech_order, 'fontsize', 20);
+else
+    cb.Ticks = 1:4;
+    cb.TickLabels = mech_order;
+end
+
