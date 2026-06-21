@@ -148,12 +148,14 @@ ylabel('log10(grain size (mm))')
 title([num2str(f), ' Hz, ', num2str(T - 273), ' ^oC'])
 set(gca, "fontsize", 20)
 
-map = [255 100 100; % color for 1 (red)
-       25 128 25; % color for 2 (dark green)
-       100 100 255; % color for 3 (blue)
-       255 255 25] / 255; % color for 4 (yellow)
+% define a categorical colormap
+map = [255 0 120;
+       250 173  119;
+       100 100 255;
+       191, 191, 22] / 255;
+
 colormap(map);
-caxis([0.5 4.5]);    % align integer centers to colormap rows
+caxis([0.5 4.5]);  % align integer centers to colormap rows
 cb = colorbar;
 
 if is_octave
