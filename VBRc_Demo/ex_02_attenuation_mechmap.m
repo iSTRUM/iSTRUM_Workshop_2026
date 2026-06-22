@@ -70,30 +70,12 @@ VBR_HTB.in.anelastic.xfit_premelt.Ap_fac_3=0;
 disp("Analytical maxwell with viscous backstress viscosity")
 VBR_disl = struct();
 VBR_disl.in = VBR.in;
-VBR_disl.in.viscous.methods_list={'BKHK2023'};
+VBR_disl.in.viscous.methods_list={'BKHK2023'}; % viscous backstress model
 VBR_disl.in.anelastic.methods_list={'maxwell_analytical'};
 % select viscous method, in this case the backstress model with
 % dislocation recovery by grain-boundary and pipe diffusion
 VBR_disl.in.anelastic.maxwell_analytical.viscosity_method_mechanism = 'gbnp';
 [VBR_disl] = VBR_spine(VBR_disl); % run VBR
-
-%% calculate complex viscosity and effective viscosity for each model
-
-VBR.in.SV.f_reshape = reshape(VBR.in.SV.f, [1 1 1 length(f)]); %Hz, reshpae vector for multiplication with 4-D array
-
-disp("Calculating complex viscosity, effective viscosity")
-%complex viscosity
-VBR_linBackstress.out.anelastic.backstress_linear.eta_complex = -1i*(VBR_linBackstress.out.anelastic.backstress_linear.J1+1i.*VBR_linBackstress.out.anelastic.backstress_linear.J2).^-1./VBR.in.SV.f_reshape; %complex viscosity
-VBR_peak.out.anelastic.xfit_premelt.eta_complex               = -1i*(VBR_peak.out.anelastic.xfit_premelt.J1+1i.*VBR_peak.out.anelastic.xfit_premelt.J2)                            .^-1./VBR.in.SV.f_reshape; %complex viscosity
-VBR_HTB.out.anelastic.xfit_premelt.eta_complex                = -1i*(VBR_HTB.out.anelastic.xfit_premelt.J1+1i.*VBR_HTB.out.anelastic.xfit_premelt.J2)                              .^-1./VBR.in.SV.f_reshape; %complex viscosity
-VBR_disl.out.anelastic.maxwell_analytical.eta_complex         = -1i*(VBR_disl.out.anelastic.maxwell_analytical.J1+1i.*VBR_disl.out.anelastic.maxwell_analytical.J2)                .^-1./VBR.in.SV.f_reshape; %complex viscosity
-
-%effective viscosity
-VBR_linBackstress.out.anelastic.backstress_linear.eta_eff     = abs(VBR_linBackstress.out.anelastic.backstress_linear.eta_complex);%Pas, magnitude of complex viscosity (i.e., effective viscosity)
-VBR_peak.out.anelastic.xfit_premelt.eta_eff                   = abs(VBR_peak.out.anelastic.xfit_premelt.eta_complex);%Pas, magnitude of complex viscosity (i.e., effective viscosity)
-VBR_HTB.out.anelastic.xfit_premelt.eta_eff                    = abs(VBR_HTB.out.anelastic.xfit_premelt.eta_complex);%Pas, magnitude of complex viscosity (i.e., effective viscosity)
-VBR_disl.out.anelastic.maxwell_analytical.eta_eff             = abs(VBR_disl.out.anelastic.maxwell_analytical.eta_complex);%Pas, magnitude of complex viscosity (i.e., effective viscosity)
-
 
 %% Combine complex compliances and calculate attenuation and effective modulus for all
 disp("Calculating effective complex compliances, attenuation")
@@ -110,8 +92,6 @@ invQ_tot = J2_tot./J1_tot; %calculate attenuation, Q-1
 G_tot = 1./(J1_tot+1i.*J2_tot); %calculate combined complex shear modulus
 G_eff_tot = abs(G_tot); %calculate effective shear modulus
 Vs_tot      =  (G_eff_tot./VBR.in.SV.rho).^0.5;%km/s, shear-wave velocity
-Eta_complex_tot     = -1i*G_tot./VBR.in.SV.f_reshape; %complex viscosity
-Eta_eff_tot =  abs(Eta_complex_tot);%Pas, magnitude of complex viscosity (i.e., effective viscosity)
 
 %% Map: stress and grain size
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
