@@ -183,12 +183,6 @@ ylabel('log10(grain size (mm))')
 title(['Mmap (storage, J1) ', num2str(f), ' Hz, ', num2str(T - 273), ' ^oC'])
 set(gca, "fontsize", 20)
 
-% define a categorical colormap
-map = [255 0 120;
-       250 173  119;
-       100 100 255;
-       191, 191, 22] / 255;
-
 colormap(map);
 caxis([0.5 4.5]);  % align integer centers to colormap rows
 cb = colorbar;

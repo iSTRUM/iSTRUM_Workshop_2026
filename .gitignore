@@ -221,3 +221,7 @@ __marimo__/
 octave-workspace
 
 *.mat
+*.png
+*.mp4
+*.gif
+.DS_Store
