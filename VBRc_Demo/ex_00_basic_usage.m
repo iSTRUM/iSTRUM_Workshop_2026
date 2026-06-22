@@ -22,13 +22,13 @@ vbrListMethods
 
 VBR.in.elastic.methods_list={'anharmonic';'anh_poro';};
 VBR.in.viscous.methods_list={'HK2003';'HZK2011'};
-VBR.in.anelastic.methods_list={'eburgers_psp';'andrade_psp';'xfit_mxw'};
+VBR.in.anelastic.methods_list={'eburgers_psp';'andrade_psp';'xfit_mxw'; 'backstress_linear'};
 
 %  frequencies to calculate at
 VBR.in.SV.f = logspace(-2.2,-1.3,4); % [Hz]
 
 %  size of the state variable arrays. arrays can be any shape
-%  but all arays must be the same shape.
+%  but all arrays must be the same shape.
 VBR.in.SV.T_K = linspace(600, 1600, 100)+273; % temperature [K]
 sz = size(VBR.in.SV.T_K);
 VBR.in.SV.P_GPa = 2 * ones(sz); % pressure [GPa]

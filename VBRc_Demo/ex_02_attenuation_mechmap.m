@@ -98,13 +98,13 @@ VBR_disl.out.anelastic.maxwell_analytical.eta_eff             = abs(VBR_disl.out
 %% Combine complex compliances and calculate attenuation and effective modulus for all
 disp("Calculating effective complex compliances, attenuation")
 % find unrelaxed modulus
-Ju = (1./VBR_linBackstress.out.elastic.anharmonic.Gu); %GPa, unrelaxed shear compliance, is equal for all three models
+Ju = (1./VBR_linBackstress.out.elastic.anharmonic.Gu); %GPa, unrelaxed shear compliance, is equal for all models
 
 % Set NaNs to 0 in J2 solution of maxwell_analytical (e.g., those that commonly result from the backstress model breaking down at small grain sizes and stresses)
 VBR_disl.out.anelastic.maxwell_analytical.J2(isnan(VBR_disl.out.anelastic.maxwell_analytical.J2))=0;
 
 % Sum J1 and J2s to get invQ and Geff
-J1_tot =  VBR_HTB.out.anelastic.xfit_premelt.J1 + VBR_peak.out.anelastic.xfit_premelt.J1 + VBR_linBackstress.out.anelastic.backstress_linear.J1 + VBR_disl.out.anelastic.maxwell_analytical.J1 - 3*Ju; %subtracting Ju twice as it is incorporated in J1 of both the HTB, peak, and backstress models%
+J1_tot =  VBR_HTB.out.anelastic.xfit_premelt.J1 + VBR_peak.out.anelastic.xfit_premelt.J1 + VBR_linBackstress.out.anelastic.backstress_linear.J1 + VBR_disl.out.anelastic.maxwell_analytical.J1 - 3*Ju; %subtracting 3 Ju as it is incorporated in J1 of all the models
 J2_tot =  VBR_HTB.out.anelastic.xfit_premelt.J2 + VBR_peak.out.anelastic.xfit_premelt.J2 + VBR_linBackstress.out.anelastic.backstress_linear.J2 + VBR_disl.out.anelastic.maxwell_analytical.J2;
 invQ_tot = J2_tot./J1_tot; %calculate attenuation, Q-1
 G_tot = 1./(J1_tot+1i.*J2_tot); %calculate combined complex shear modulus
@@ -140,12 +140,47 @@ for i = 1:length(sig)
     end
 end
 
+% define a categorical colormap
+map = [255 0 120;
+       250 173  119;
+       100 100 255;
+       191, 191, 22] / 255;
+
+
+figure()
+pcolor(log10(VBR.in.SV.sig_MPa), log10(SV.dg_um/1e6*1e3), log10(invQ_tot))
+xlabel('log10(stress)')
+ylabel('log10(grain size (mm))')
+title(['log10( Q^{-1}) ', num2str(f), ' Hz, ', num2str(T - 273), ' ^oC'])
+set(gca, "fontsize", 20, 'clim', [-4 0])
+cb = colorbar;
+
 
 figure()
 pcolor(log10(VBR.in.SV.sig_MPa), log10(SV.dg_um/1e6*1e3), Qmech)
 xlabel('log10(stress)')
 ylabel('log10(grain size (mm))')
-title([num2str(f), ' Hz, ', num2str(T - 273), ' ^oC'])
+title(['Q^{-1}map (dissipation, J2) ', num2str(f), ' Hz, ', num2str(T - 273), ' ^oC'])
+set(gca, "fontsize", 20)
+
+
+colormap(map);
+caxis([0.5 4.5]);  % align integer centers to colormap rows
+cb = colorbar;
+
+if is_octave
+    set(cb, 'ytick', 1:4, 'yticklabel', mech_order, 'fontsize', 20);
+else
+    cb.Ticks = 1:4;
+    cb.TickLabels = mech_order;
+end
+
+
+figure()
+pcolor(log10(VBR.in.SV.sig_MPa), log10(SV.dg_um/1e6*1e3), Mmech)
+xlabel('log10(stress)')
+ylabel('log10(grain size (mm))')
+title(['Mmap (storage, J1) ', num2str(f), ' Hz, ', num2str(T - 273), ' ^oC'])
 set(gca, "fontsize", 20)
 
 % define a categorical colormap
