@@ -29,7 +29,7 @@ VBR.in.SV.f = logspace(-2.2,-1.3,4); % [Hz]
 
 %  size of the state variable arrays. arrays can be any shape
 %  but all arrays must be the same shape.
-VBR.in.SV.T_K = linspace(600, 1600, 100)+273; % temperature [K]
+VBR.in.SV.T_K = linspace(800, 1400, 100)+273; % temperature [K]
 sz = size(VBR.in.SV.T_K);
 VBR.in.SV.P_GPa = 2 * ones(sz); % pressure [GPa]
 VBR.in.SV.rho = 3300 * ones(sz); % density [kg m^-3]
@@ -80,8 +80,9 @@ for ifield = 1:nfields
     semilogy(VBR.in.SV.T_K-273, eta_total, 'displayname', viscous_fields{ifield})
 end
 legend()
-ylabel(['eta (', VBR.out.viscous.HZK2011.units.eta, ')'])
+ylabel(['\eta_{ss} (', VBR.out.viscous.HZK2011.units.eta, ')'])
 xlabel('T (deg C)')
+set(gca, "fontsize", 20)
 
 % 7. saving results
 help VBR_save
