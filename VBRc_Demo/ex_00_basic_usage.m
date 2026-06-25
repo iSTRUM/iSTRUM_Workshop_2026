@@ -24,19 +24,6 @@ vbr_init
 
 VBR_list_methods
 
-VBR.in.elastic.methods_list = {'anharmonic'};
-VBR.in.anelastic.methods_list = {'eburgers_psp', 'andrade_psp', 'xfit_premelt'};
-
-VBR.in.SV.f = logspace(-5, -1, 10);
-
-VBR.in.SV.T_K = transpose(linspace(800, 1500, 30));
-sz_T = size(VBR.in.SV.T_K);
-VBR.in.SV.P_GPa = 2.5 * ones(sz_T);
-
-VBR.in.SV.phi = zeros(sz_T);
-VBR.in.SV.rho = 3300 * ones(sz_T);
-VBR.in.SV.dg_um = 0.01 * 1e6 * ones(sz_T);
-VBR.in.SV.Tsolidus_K=1200*ones(sz_T) + 273;
 
 % what SVs are required? check docs!
 % https://vbr-calc.github.io/vbr/vbrmethods/viscous/
@@ -45,7 +32,7 @@ VBR.in.SV.Tsolidus_K=1200*ones(sz_T) + 273;
 % or just try and you should get useful error messages...
 
 % 3. call the VBRc
-VBR = VBR_spine(VBR);
+% VBR = VBR_spine(VBR);
 
 
 
