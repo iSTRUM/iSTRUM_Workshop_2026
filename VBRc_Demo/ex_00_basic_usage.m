@@ -21,7 +21,7 @@ vbr_init
 %    - set the properties and methods
 %    - set thermodynamic state variable arrays  (T, phi)
 
-vbrListMethods
+VBR_list_methods
 
 
 
