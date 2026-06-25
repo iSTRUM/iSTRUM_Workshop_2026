@@ -1,4 +1,7 @@
 
+  addpath(getenv('vbrdir'))
+  vbr_init
+
   VBR = struct();
   %% write method list %%
   VBR.in.elastic.methods_list={'anharmonic'};
