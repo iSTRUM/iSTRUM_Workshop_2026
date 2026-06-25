@@ -25,10 +25,6 @@ vbrListMethods
 
 
 
-VBR = struct();
-
-
-
 % what SVs are required? check docs!
 % https://vbr-calc.github.io/vbr/vbrmethods/viscous/
 % https://vbr-calc.github.io/vbr/vbrmethods/elastic/
@@ -36,7 +32,7 @@ VBR = struct();
 % or just try and you should get useful error messages...
 
 % 3. call the VBRc
-VBR = VBR_spine(VBR);
+% VBR = VBR_spine(VBR);
 
 
 
